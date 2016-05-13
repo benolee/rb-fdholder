@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+usage = <<eos
+  Usage:
+    rb-fdholder daemon /path/to/control/socket
+
+    rb-fdholder get /path/to/control/socket 'keyname/or/watever' -- cat
+
+    rb-fdholder put /path/to/control/socket '/some-key/name' < wat.txt
+
+    rb-fdholder list /path/to/control/socket
+
+    rb-fdholder delete /path/to/control/socket 'key'
+
+    -h, --help  Print usage information
+eos
+
+argv = ARGV.dup
+
+ARGV.options do |opts|
+  opts.on_tail('-h', '--help') { puts usage; exit }
+  opts.parse!
+end
+
+subcommand = argv.shift
+if !%w(daemon get put list delete).include?(subcommand)
+  puts usage
+  exit 1
+end
+
+exec "ruby", "rb-fdholder-#{subcommand}.rb", *argv
